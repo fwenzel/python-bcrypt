@@ -41,9 +41,9 @@ __author__ = ("Michael Gilfix <mgilfix@eecs.tufts.edu>, "
 import struct
 
 
-class Blowfish:
+class EksBlowfish:
 
-    """Blowfish encryption Scheme
+    """Expensive key schedule Blowfish encryption scheme
 
     This class implements the encryption and decryption
     functionality of the Blowfish cipher.
@@ -93,11 +93,7 @@ class Blowfish:
     # For the __round_func
     modulus = long (2) ** 32
 
-    def __init__ (self, key):
-
-        if not key or len (key) < 8 or len (key) > 56:
-            raise RuntimeError, "Attempted to initialize Blowfish cipher with key of invalid length: %s" %len (key)
-
+    def __init__ (self):
         self.p_boxes = [
             0x243F6A88, 0x85A308D3, 0x13198A2E, 0x03707344,
             0xA4093822, 0x299F31D0, 0x082EFA98, 0xEC4E6C89,
@@ -375,15 +371,16 @@ class Blowfish:
 
     def expandkey(self, salt, key):
         """EksBlowfish key expansion step."""
+
         # Cycle through the p-boxes and round-robin XOR the
         # key with the p-boxes
-        key_len = len (key)
+        key_len = len(key)
         index = 0
-        for i in range (len (self.p_boxes)):
-            val = (ord (key[index % key_len]) << 24) + \
-                  (ord (key[(index + 1) % key_len]) << 16) + \
-                  (ord (key[(index + 2) % key_len]) << 8) + \
-                   ord (key[(index + 3) % key_len])
+        for i in range (len(self.p_boxes)):
+            val = (ord(key[index % key_len]) << 24) + \
+                  (ord(key[(index + 1) % key_len]) << 16) + \
+                  (ord(key[(index + 2) % key_len]) << 8) + \
+                   ord(key[(index + 3) % key_len])
             self.p_boxes[i] = self.p_boxes[i] ^ val
             index = index + 4
 
@@ -395,39 +392,27 @@ class Blowfish:
         l, r = 0, 0
         salt_idx = 0  # Alternate between first and second set of 2x32bits.
 
-        # Chain replace the p-boxes
-        for i in range (0, len(self.p_boxes), 2):
-            l = l ^ salt32[salt_idx]
-            r = r ^ salt32[salt_idx+1]
+        # Chain replace the p-array, then all 4 sets of s-boxes
+        for boxes in [self.p_boxes,] + self.s_boxes:
+            for i in xrange(0, len(boxes), 2):
+                l = l ^ salt32[salt_idx]
+                r = r ^ salt32[salt_idx+1]
 
-            # Alternate between first and second 2 blocks of salt.
-            salt_idx = (salt_idx + 2) % 4
+                # Alternate between first and second 2 blocks of salt.
+                salt_idx = (salt_idx + 2) % 4
 
-            l, r = self.cipher(l, r, self.ENCRYPT)
+                l, r = self.cipher(l, r, self.ENCRYPT)
 
-            self.p_boxes[i] = l
-            self.p_boxes[i + 1] = r
-
-        # Chain replace the s-boxes the same way
-        for i in range (0, len(self.s_boxes), 2):
-            l = l ^ salt32[salt_idx]
-            r = r ^ salt32[salt_idx+1]
-
-            # Alternate between first and second 2 blocks of salt.
-            salt_idx = (salt_idx + 2) % 4
-
-            l, r = self.cipher(l, r, self.ENCRYPT)
-
-            self.s_boxes[i] = l
-            self.s_boxes[i + 1] = r
+                boxes[i] = l
+                boxes[i + 1] = r
 
     def cipher(self, xl, xr, direction):
         """En/decrypt with Blowfish."""
 
         if direction == self.ENCRYPT:
-            for i in range (16):
+            for i in xrange(16):
                 xl = xl ^ self.p_boxes[i]
-                xr = self.__round_func (xl) ^ xr
+                xr = self.__round_func(xl) ^ xr
                 xl, xr = xr, xl
             xl, xr = xr, xl
             xr = xr ^ self.p_boxes[16]
@@ -435,7 +420,7 @@ class Blowfish:
         else:
             for i in range (17, 1, -1):
                 xl = xl ^ self.p_boxes[i]
-                xr = self.__round_func (xl) ^ xr
+                xr = self.__round_func(xl) ^ xr
                 xl, xr = xr, xl
             xl, xr = xr, xl
             xr = xr ^ self.p_boxes[1]
@@ -448,11 +433,11 @@ class Blowfish:
         c = (xl & 0x0000FF00) >> 8
         d = xl & 0x000000FF
 
-        # Perform all ops as longs then and out the last 32-bits to
-        # obtain the integer
-        f = (long (self.s_boxes[0][a]) + long (self.s_boxes[1][b])) % self.modulus
-        f = f ^ long (self.s_boxes[2][c])
-        f = f + long (self.s_boxes[3][d])
+        # Perform all ops as longs, then output the last 32-bits to obtain the
+        # integer
+        f = (long(self.s_boxes[0][a]) + long(self.s_boxes[1][b])) % self.modulus
+        f = f ^ long(self.s_boxes[2][c])
+        f = f + long(self.s_boxes[3][d])
         f = (f % self.modulus) & 0xFFFFFFFF
 
         return f

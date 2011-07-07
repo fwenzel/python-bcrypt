@@ -24,13 +24,13 @@ cost increases as 2**log_rounds.
 import base64
 import os
 
-from lib.eksblowfish import Blowfish
+from lib.eksblowfish import EksBlowfish
 
 
 BCRYPT_VERSION = ('2', 'a')  # major, minor
 BCRYPT_SALTLEN = 16          # expected raw salt length in Bytes.
 BCRYPT_MAGICTEXT = 'OrpheanBeholderScryDoubt'   # Magic text to be enciphered.
-BCRYPT_BLOCKS = len(BCRYPT_MAGICTEXT * 8 / 32)  # Ciphertext blocks
+BCRYPT_BLOCKS = len(BCRYPT_MAGICTEXT) * 8 / 32  # Ciphertext blocks
 BCRYPT_MINROUNDS = 16        # Salt contains log2(rounds).
 
 
@@ -83,8 +83,8 @@ def hashpw(password, salt):
 
     bf.expandkey(raw_salt, password)
     for k in xrange(rounds):
-        bf.expandstate(0, raw_salt)
-        bf.expandstate(0, password)
+        bf.expandkey(0, raw_salt)
+        bf.expandkey(0, password)
 
     ## Encrypt magic value, 64 times.
     # First, cut into 32bit integers.
