@@ -100,65 +100,6 @@ def hashpw(password, salt):
     return salt + result
 
 
-"""
-pybc_bcrypt(const char *key, const char *salt)
-{
-        pybc_blf_ctx state;
-        u_int32_t rounds, i, k;
-        u_int16_t j;
-        u_int8_t key_len, salt_len, logr, minor;
-        u_int8_t ciphertext[4 * BCRYPT_BLOCKS] = "OrpheanBeholderScryDoubt";
-        u_int8_t csalt[BCRYPT_MAXSALT];
-        u_int32_t cdata[BCRYPT_BLOCKS];
-        int n;
-
-        /* Setting up S-Boxes and Subkeys */
-        pybc_Blowfish_initstate(&state);
-        pybc_Blowfish_expandstate(&state, csalt, salt_len,
-            (u_int8_t *) key, key_len);
-        for (k = 0; k < rounds; k++) {
-                pybc_Blowfish_expand0state(&state, (u_int8_t *) key, key_len);
-                pybc_Blowfish_expand0state(&state, csalt, salt_len);
-        }
-
-        /* This can be precomputed later */
-        j = 0;
-        for (i = 0; i < BCRYPT_BLOCKS; i++) {
-                cdata[i] = pybc_Blowfish_stream2word(ciphertext,
-                    4 * BCRYPT_BLOCKS, &j);
-        }
-
-        /* Now do the encryption */
-        for (k = 0; k < 64; k++)
-                pybc_blf_enc(&state, cdata, BCRYPT_BLOCKS / 2);
-
-        for (i = 0; i < BCRYPT_BLOCKS; i++) {
-                ciphertext[4 * i + 3] = cdata[i] & 0xff;
-                cdata[i] = cdata[i] >> 8;
-                ciphertext[4 * i + 2] = cdata[i] & 0xff;
-                cdata[i] = cdata[i] >> 8;
-                ciphertext[4 * i + 1] = cdata[i] & 0xff;
-                cdata[i] = cdata[i] >> 8;
-                ciphertext[4 * i + 0] = cdata[i] & 0xff;
-        }
-
-
-        i = 0;
-        encrypted[i++] = '$';
-        encrypted[i++] = BCRYPT_VERSION;
-        if (minor)
-                encrypted[i++] = minor;
-        encrypted[i++] = '$';
-
-        snprintf(encrypted + i, 4, "%2.2u$", logr);
-
-        encode_base64((u_int8_t *) encrypted + i + 3, csalt, BCRYPT_MAXSALT);
-        encode_base64((u_int8_t *) encrypted + strlen(encrypted), ciphertext,
-            4 * BCRYPT_BLOCKS - 1);
-        return encrypted;
-}
-"""
-
 def _encode_salt(csalt, log_rounds):
     """"
     encode_salt(csalt, log_rounds) -> encoded_salt
