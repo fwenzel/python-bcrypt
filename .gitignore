@@ -1,0 +1,7 @@
+*.py[co]
+*.sw[po]
+pip-log.txt
+.DS_Store
+.noseids
+tmp/*
+*~
