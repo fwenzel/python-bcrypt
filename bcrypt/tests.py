@@ -28,6 +28,11 @@ class BcryptTestCase(unittest.TestCase):
 
         eq_(hashed, should_be)
 
+    def test_base64(self):
+        """Test bcrypt's awkward implementation of base64."""
+        something = 'abcdef'
+        eq_(something, bcrypt._b64_decode(bcrypt._b64_encode(something)))
+
 
 class BlowfishTestCase(unittest.TestCase):
     def setUp(self):

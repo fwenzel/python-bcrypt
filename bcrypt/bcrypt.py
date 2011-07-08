@@ -23,6 +23,7 @@ cost increases as 2**log_rounds.
 
 import base64
 import os
+import string
 import struct
 
 from lib.eksblowfish import EksBlowfish
@@ -33,6 +34,15 @@ BCRYPT_SALTLEN = 16          # expected raw salt length in Bytes.
 BCRYPT_MAGICTEXT = 'OrpheanBeholderScryDoubt'   # Magic text to be enciphered.
 BCRYPT_BLOCKS = len(BCRYPT_MAGICTEXT) * 8 / 32  # Ciphertext blocks
 BCRYPT_MINROUNDS = 16        # Salt contains log2(rounds).
+
+# bcrypt uses a strange base64 encoding, which is incompatible with the
+# standard MIME way of doing it. Sigh.
+B64_CHARS_BCRYPT = ''.join(('./', string.ascii_uppercase,
+                            string.ascii_lowercase, string.digits))
+B64_CHARS = ''.join((string.ascii_uppercase, string.ascii_lowercase,
+                     string.digits, '+/'))
+B64_TO_BCRYPT = string.maketrans(B64_CHARS, B64_CHARS_BCRYPT)
+B64_FROM_BCRYPT = string.maketrans(B64_CHARS_BCRYPT, B64_CHARS)
 
 
 def gensalt(log_rounds=12):
@@ -128,7 +138,7 @@ def _b64_encode(data):
 
     Uses alternative chars and removes base 64 padding.
     """
-    return base64.b64encode(data, './').rstrip('=')
+    return base64.b64encode(data).translate(B64_TO_BCRYPT, '=')
 
 
 def _b64_decode(data):
@@ -137,5 +147,6 @@ def _b64_decode(data):
 
     Uses alternative chars and handles possibly missing padding.
     """
+    encoded = data.translate(B64_FROM_BCRYPT)
     padding = '=' * (4 - len(data) % 4) if len(data) % 4 else ''
-    return base64.b64decode('%s%s' % (data, padding), './')
+    return base64.b64decode('%s%s' % (encoded, padding), './')
