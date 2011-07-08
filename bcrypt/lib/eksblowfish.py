@@ -78,7 +78,7 @@ class EksBlowfish:
 
     Private members:
 
-        def __round_func (self, xl)
+        def _round_func (self, xl)
             Performs an obscuring function on the 32-bit
             block of data 'xl', which is the left half of
             the 64-bit block of data. Returns the 32-bit
@@ -90,7 +90,7 @@ class EksBlowfish:
     ENCRYPT = 0
     DECRYPT = 1
 
-    # For the __round_func
+    # For the _round_func
     modulus = long (2) ** 32
 
     def __init__ (self):
@@ -412,7 +412,7 @@ class EksBlowfish:
         if direction == self.ENCRYPT:
             for i in xrange(16):
                 xl = xl ^ self.p_boxes[i]
-                xr = self.__round_func(xl) ^ xr
+                xr = self._round_func(xl) ^ xr
                 xl, xr = xr, xl
             xl, xr = xr, xl
             xr = xr ^ self.p_boxes[16]
@@ -420,14 +420,14 @@ class EksBlowfish:
         else:
             for i in range (17, 1, -1):
                 xl = xl ^ self.p_boxes[i]
-                xr = self.__round_func(xl) ^ xr
+                xr = self._round_func(xl) ^ xr
                 xl, xr = xr, xl
             xl, xr = xr, xl
             xr = xr ^ self.p_boxes[1]
             xl = xl ^ self.p_boxes[0]
         return xl, xr
 
-    def __round_func (self, xl):
+    def _round_func(self, xl):
         a = (xl & 0xFF000000) >> 24
         b = (xl & 0x00FF0000) >> 16
         c = (xl & 0x0000FF00) >> 8
@@ -472,22 +472,13 @@ class EksBlowfish:
         ])
         return chars
 
-    def blocksize (self):
-        return 8
-
-    def key_length (self):
-        return 56
-
-    def key_bits (self):
-        return 56 * 8
-
 
 ##############################################################
 # Module testing
 
 if __name__ == '__main__':
     key = 'This is a test key'
-    cipher = Blowfish (key)
+    cipher = EksBlowfish(key)
 
     print "Testing encryption:"
     xl = 123456

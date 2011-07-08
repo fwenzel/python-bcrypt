@@ -23,6 +23,7 @@ cost increases as 2**log_rounds.
 
 import base64
 import os
+import struct
 
 from lib.eksblowfish import EksBlowfish
 
@@ -89,7 +90,7 @@ def hashpw(password, salt):
     ## Encrypt magic value, 64 times.
     # First, cut into 32bit integers.
     bit_format = '<' + 'I' * BCRYPT_BLOCKS
-    ctext = struct.unpack(bit_format, BCRYPT_MAGICTEXT)
+    ctext = list(struct.unpack(bit_format, BCRYPT_MAGICTEXT))
     for i in xrange(64):
         # Encrypt blocks pairwise.
         for d in xrange(0, BCRYPT_BLOCKS, 2):
