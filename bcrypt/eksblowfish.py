@@ -369,12 +369,19 @@ class EksBlowfish:
             ]
         ]
 
-    def expandkey(self, salt, key):
+    def expandkey(self, salt, key, key_len=None):
         """EksBlowfish key expansion step."""
+
+        # key_len is an option to allow for trailing zerobyte to be included
+        # in the XOR step.
+        if not key_len:
+            key_len = len(key)
+        # Pad or shorten key according to key_len.
+        # If you care: 'x' * -10 == ''.
+        key = key[:key_len] + ('\0' * (key_len - len(key)))
 
         # Cycle through the p-boxes and round-robin XOR the
         # key with the p-boxes
-        key_len = len(key)
         index = 0
         for i in range (len(self.p_boxes)):
             val = (ord(key[index % key_len]) << 24) + \

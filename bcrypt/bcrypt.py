@@ -26,7 +26,7 @@ import os
 import string
 import struct
 
-from lib.eksblowfish import EksBlowfish
+from eksblowfish import EksBlowfish
 
 
 BCRYPT_VERSION = ('2', 'a')  # major, minor
