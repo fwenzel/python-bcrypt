@@ -99,7 +99,7 @@ def hashpw(password, salt):
 
     ## Encrypt magic value, 64 times.
     # First, cut into 32bit integers.
-    bit_format = '<' + 'I' * BCRYPT_BLOCKS
+    bit_format = '>' + 'I' * BCRYPT_BLOCKS
     ctext = list(struct.unpack(bit_format, BCRYPT_MAGICTEXT))
     for i in xrange(64):
         # Encrypt blocks pairwise.

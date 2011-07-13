@@ -394,7 +394,9 @@ class EksBlowfish:
         ## Encrypt salt with current key schedule state.
         # Split salt into four 32bit words.
         # If salt is 0, treat as 128 bits of 0.
-        salt32 = struct.unpack('<IIII', salt) if salt else (0, 0, 0, 0)
+        # Also, enforce big endian because that's what the C implementation
+        # does. WHY, I HAVE NO IDEA.
+        salt32 = struct.unpack('>IIII', salt) if salt else (0, 0, 0, 0)
 
         l, r = 0, 0
         salt_idx = 0  # Alternate between first and second set of 2x32bits.
