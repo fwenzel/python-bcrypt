@@ -87,15 +87,15 @@ def hashpw(password, salt):
 
     # We don't want the base64 salt but the raw data.
     raw_salt = _b64_decode(b64salt)
-    #key_len = len(password) + (minor >= 'a' and 1 or 0);
+    key_len = len(password) + (minor >= 'a' and 1 or 0);
 
     # Set up EksBlowfish (this is the expensive part)
     bf = EksBlowfish()
 
-    bf.expandkey(raw_salt, password)
+    bf.expandkey(raw_salt, password, key_len)
     for k in xrange(rounds):
-        bf.expandkey(0, raw_salt)
-        bf.expandkey(0, password)
+        bf.expandkey(0, raw_salt, BCRYPT_SALTLEN)
+        bf.expandkey(0, password, key_len)
 
     ## Encrypt magic value, 64 times.
     # First, cut into 32bit integers.
