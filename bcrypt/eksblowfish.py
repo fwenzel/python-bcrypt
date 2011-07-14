@@ -42,7 +42,6 @@ import struct
 
 
 class EksBlowfish:
-
     """Expensive key schedule Blowfish encryption scheme
 
     This class implements the encryption and decryption

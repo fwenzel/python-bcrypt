@@ -37,10 +37,10 @@ BCRYPT_MINROUNDS = 16        # Salt contains log2(rounds).
 
 # bcrypt uses a strange base64 encoding, which is incompatible with the
 # standard MIME way of doing it. Sigh.
-B64_CHARS_BCRYPT = ''.join(('./', string.ascii_uppercase,
-                            string.ascii_lowercase, string.digits))
 B64_CHARS = ''.join((string.ascii_uppercase, string.ascii_lowercase,
                      string.digits, '+/'))
+B64_CHARS_BCRYPT = ''.join(('./', string.ascii_uppercase,
+                            string.ascii_lowercase, string.digits))
 B64_TO_BCRYPT = string.maketrans(B64_CHARS, B64_CHARS_BCRYPT)
 B64_FROM_BCRYPT = string.maketrans(B64_CHARS_BCRYPT, B64_CHARS)
 
@@ -94,11 +94,14 @@ def hashpw(password, salt):
 
     bf.expandkey(raw_salt, password, key_len)
     for k in xrange(rounds):
-        bf.expandkey(0, raw_salt, BCRYPT_SALTLEN)
+        # NB: The original bcrypt paper runs this step with the salt first,
+        # then the password, not vice versa. The C implementation flips those,
+        # which is why we reproduce the same bug here.
         bf.expandkey(0, password, key_len)
+        bf.expandkey(0, raw_salt, BCRYPT_SALTLEN)
 
     ## Encrypt magic value, 64 times.
-    # First, cut into 32bit integers.
+    # First, cut into 32bit integers. Big endian, again, sigh.
     bit_format = '>' + 'I' * BCRYPT_BLOCKS
     ctext = list(struct.unpack(bit_format, BCRYPT_MAGICTEXT))
     for i in xrange(64):
@@ -138,7 +141,8 @@ def _b64_encode(data):
 
     Uses alternative chars and removes base 64 padding.
     """
-    return base64.b64encode(data).translate(B64_TO_BCRYPT, '=')
+    enc = base64.b64encode(data)
+    return enc.translate(B64_TO_BCRYPT, '=')
 
 
 def _b64_decode(data):
@@ -149,4 +153,4 @@ def _b64_decode(data):
     """
     encoded = data.translate(B64_FROM_BCRYPT)
     padding = '=' * (4 - len(data) % 4) if len(data) % 4 else ''
-    return base64.b64decode('%s%s' % (encoded, padding), './')
+    return base64.b64decode(encoded + padding)
