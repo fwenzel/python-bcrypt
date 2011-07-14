@@ -81,15 +81,16 @@ def hashpw(password, salt):
     if rounds < BCRYPT_MINROUNDS:
         raise ValueError('Minimum number of rounds is: %d' % BCRYPT_MINROUNDS)
 
-    # Enforce not base64-ed minimum salt length.
+    # Enforce (not base64-ed) minimum salt length.
     if (len(b64salt) * 3 / 4 != BCRYPT_SALTLEN):
         raise ValueError('Salt has invalid length.')
 
     # We don't want the base64 salt but the raw data.
     raw_salt = _b64_decode(b64salt)
+    # Revision a of bcrypt adds a trailing \0 byte to the key.
     key_len = len(password) + (minor >= 'a' and 1 or 0);
 
-    # Set up EksBlowfish (this is the expensive part)
+    ## Set up EksBlowfish (this is the expensive part).
     bf = EksBlowfish()
 
     bf.expandkey(raw_salt, password, key_len)
@@ -109,8 +110,10 @@ def hashpw(password, salt):
         for d in xrange(0, BCRYPT_BLOCKS, 2):
             ctext[d], ctext[d+1] = bf.cipher(ctext[d], ctext[d+1], bf.ENCRYPT)
 
-    # Concatenate cost, salt, result, base64ed.
-    result = _b64_encode(struct.pack(bit_format, *ctext))
+    ## Concatenate cost, salt, result, and return.
+    # The C implementation cuts off the last byte of the ciphertext, so we do
+    # the same.
+    result = _b64_encode(struct.pack(bit_format, *ctext)[:-1])
     return salt + result
 
 
