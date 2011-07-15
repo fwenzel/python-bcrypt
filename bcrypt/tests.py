@@ -20,9 +20,9 @@ class BcryptTestCase(unittest.TestCase):
 
     def test_hashpw(self):
         """Test password hashing, with known salt."""
-        salt = '$2a$04$JaLL9GgWK2Y.Ek27R27rMQ'
-        should_be = ('$2a$04$JaLL9GgWK2Y.Ek27R27rMO24vY5eWcVD.XQJI8sC'
-                     'gujdHtNeBMYcG')
+        salt = '$2a$04$e9aKlXB7x0Uacbi7tRyKA.'
+        should_be = ('$2a$04$e9aKlXB7x0Uacbi7tRyKA.ZE1qLWlAKZiMV9P2q8bI.'
+                     'azUYj2EcFS')
 
         hashed = bcrypt.hashpw('abc', salt)
 
