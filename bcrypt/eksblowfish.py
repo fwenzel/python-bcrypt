@@ -29,9 +29,6 @@ cipher and offers substantial speed gains over DES.
 The key is a string of length anywhere between 64 and 448 bits, or
 equivalently 8 and 56 bytes. The encryption and decryption functions operate
 on 64-bit blocks, or 8 byte strings.
-
-Send questions, comments, bugs my way:
-    Michael Gilfix <mgilfix@eecs.tufts.edu>
 """
 
 __author__ = ("Michael Gilfix <mgilfix@eecs.tufts.edu>, "
@@ -93,6 +90,7 @@ class EksBlowfish:
     modulus = long (2) ** 32
 
     def __init__ (self):
+        """Initialize P and S boxes with digits of Pi."""
         self.p_boxes = [
             0x243F6A88, 0x85A308D3, 0x13198A2E, 0x03707344,
             0xA4093822, 0x299F31D0, 0x082EFA98, 0xEC4E6C89,
