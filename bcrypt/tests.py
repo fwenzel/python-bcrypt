@@ -42,3 +42,12 @@ class BlowfishTestCase(unittest.TestCase):
         """Blowfish-internal shuffling function."""
         eq_(self.bf._round_func(12345678), 482594201)
         eq_(self.bf._round_func(87654321), 3752855962)
+
+    def test_cipher(self):
+        """Test blowfish cipher."""
+        xl = 123456
+        xr = 654321
+
+        cl, cr = self.bf.cipher(xl, xr, self.bf.ENCRYPT)
+        dl, dr = self.bf.cipher(cl, cr, self.bf.DECRYPT)
+        eq_((xl, xr), (dl, dr))
