@@ -424,7 +424,7 @@ class EksBlowfish:
             xr = xr ^ self.p_boxes[16]
             xl = xl ^ self.p_boxes[17]
         else:
-            for i in range (17, 1, -1):
+            for i in xrange(17, 1, -1):
                 xl = xl ^ self.p_boxes[i]
                 xr = self._round_func(xl) ^ xr
                 xl, xr = xr, xl
