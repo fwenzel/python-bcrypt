@@ -34,7 +34,6 @@ on 64-bit blocks, or 8 byte strings.
 __author__ = ("Michael Gilfix <mgilfix@eecs.tufts.edu>, "
               "Fred Wenzel <fwenzel@mozilla.com>")
 
-
 import struct
 
 
@@ -85,9 +84,6 @@ class EksBlowfish:
     # Cipher directions
     ENCRYPT = 0
     DECRYPT = 1
-
-    # For the _round_func
-    modulus = long (2) ** 32
 
     def __init__ (self):
         """Initialize P and S boxes with digits of Pi."""
@@ -444,11 +440,11 @@ class EksBlowfish:
         c = (xl & 0x0000FF00) >> 8
         d = xl & 0x000000FF
 
-        # Perform all ops as longs, then output the last 32-bits to obtain the
-        # integer
-        f = (long(self.s_boxes[0][a]) + long(self.s_boxes[1][b])) % self.modulus
-        f = f ^ long(self.s_boxes[2][c])
-        f = f + long(self.s_boxes[3][d])
-        f = (f % self.modulus) & 0xFFFFFFFF
+        # Python casts to long automatically on integer overflow, that's okay
+        # as long as we return the lowest 32bits in the end.
+        f = self.s_boxes[0][a] + self.s_boxes[1][b]
+        f = f ^ self.s_boxes[2][c]
+        f = f + self.s_boxes[3][d]
+        f = f & 0xFFFFFFFF
 
         return f
