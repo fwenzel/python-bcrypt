@@ -415,22 +415,27 @@ class EksBlowfish:
     def cipher(self, xl, xr, direction):
         """En/decrypt with Blowfish."""
 
+        # Encryption and decryption differ only in the p-boxes they touch.
         if direction == self.ENCRYPT:
-            for i in xrange(16):
-                xl = xl ^ self.p_boxes[i]
-                xr = self._round_func(xl) ^ xr
-                xl, xr = xr, xl
-            xl, xr = xr, xl
-            xr = xr ^ self.p_boxes[16]
-            xl = xl ^ self.p_boxes[17]
+            boxes = range(16)
         else:
-            for i in xrange(17, 1, -1):
-                xl = xl ^ self.p_boxes[i]
-                xr = self._round_func(xl) ^ xr
-                xl, xr = xr, xl
+            boxes = range(17, 1, -1)
+
+        for i in boxes:
+            xl = xl ^ self.p_boxes[i]
+            xr = self._round_func(xl) ^ xr
             xl, xr = xr, xl
-            xr = xr ^ self.p_boxes[1]
+        xl, xr = xr, xl
+
+        # XOR xl and xr against box 17 and 16, respectively, for encryption,
+        # box 0 and 1 for decryption.
+        if direction == self.ENCRYPT:
+            xl = xl ^ self.p_boxes[17]
+            xr = xr ^ self.p_boxes[16]
+        else:
             xl = xl ^ self.p_boxes[0]
+            xr = xr ^ self.p_boxes[1]
+
         return xl, xr
 
     def _round_func(self, xl):
