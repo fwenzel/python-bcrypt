@@ -1,0 +1,29 @@
+$2a$12$e9aKlXB7x0Uacbi7tRyKA.dtxAt9F0IOdOSFlcEEJDSnk4Lz9rpf2
+         73232320 function calls in 97.670 CPU seconds
+
+   Ordered by: standard name
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000   97.670   97.670 <string>:1(<module>)
+        1    0.000    0.000    0.000    0.000 base64.py:42(b64encode)
+        1    0.000    0.000    0.000    0.000 base64.py:59(b64decode)
+        1    0.000    0.000    0.000    0.000 bcrypt.py:141(_b64_encode)
+        1    0.000    0.000    0.000    0.000 bcrypt.py:151(_b64_decode)
+        1    0.006    0.006   97.670   97.670 bcrypt.py:58(hashpw)
+     8193    3.981    0.000   97.660    0.012 eksblowfish.py:365(expandkey)
+  4268745   34.288    0.000   93.635    0.000 eksblowfish.py:411(cipher)
+ 68299920   59.347    0.000   59.347    0.000 eksblowfish.py:437(_round_func)
+        1    0.000    0.000    0.000    0.000 eksblowfish.py:88(__init__)
+        1    0.000    0.000   97.670   97.670 profileme.py:9(do_stuff)
+        1    0.000    0.000    0.000    0.000 {_struct.pack}
+        2    0.000    0.000    0.000    0.000 {_struct.unpack}
+        1    0.000    0.000    0.000    0.000 {binascii.a2b_base64}
+        1    0.000    0.000    0.000    0.000 {binascii.b2a_base64}
+    57356    0.006    0.000    0.006    0.000 {len}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+        1    0.000    0.000    0.000    0.000 {method 'split' of 'str' objects}
+        2    0.000    0.000    0.000    0.000 {method 'translate' of 'str' objects}
+   589896    0.036    0.000    0.036    0.000 {ord}
+     8193    0.005    0.000    0.005    0.000 {range}
+
+
