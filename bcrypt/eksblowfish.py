@@ -413,9 +413,9 @@ class EksBlowfish:
 
         # Encryption and decryption differ only in the p-boxes they touch.
         if direction == self.ENCRYPT:
-            boxes = range(16)
+            boxes = xrange(16)
         else:
-            boxes = range(17, 1, -1)
+            boxes = xrange(17, 1, -1)
 
         for i in boxes:
             xl = xl ^ self.p_boxes[i]
